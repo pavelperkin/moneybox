@@ -1,6 +1,12 @@
 require 'spec_helper'
 
 describe Moneybox::Money do
+  shared_examples_for 'operation with undefined rate' do
+    it 'Raises ArgumentError with message'do
+      expect{ subject }.to raise_error(ArgumentError, /Currency rate does not exist:/)
+    end
+  end
+
   context 'class methods' do
     describe 'conversion_rates' do
       before do
@@ -57,10 +63,82 @@ describe Moneybox::Money do
 
       context 'exchange rate does not exist' do
         let(:new_currency) { 'UAH' }
-        it 'Raises ArgumentError with message'do
-          expect{ subject }.to raise_error(ArgumentError, "Currency rate does not exist: EUR to UAH")
-        end
+        it_behaves_like 'operation with undefined rate'
       end
+    end
+
+    describe 'Sum' do
+      before do
+        described_class.set_conversion_rates('USD', { 'EUR' => 0.5 })
+      end
+
+      subject { money + another_money }
+
+      context 'work with same currency' do
+        let(:another_money) { described_class.new(20.41, 'EUR')}
+
+        it { is_expected.to be_instance_of described_class }
+        its(:amount) { is_expected.to eq 70.41 }
+        its(:currency) { is_expected.to eq 'EUR' }
+      end
+
+      context 'exchange rate exists' do
+        let(:another_money) { described_class.new(22.22, 'USD')}
+
+        it { is_expected.to be_instance_of described_class }
+        its(:amount) { is_expected.to eq 61.11 }
+        its(:currency) { is_expected.to eq 'EUR' }
+      end
+
+      context 'exchange rate does not exist' do
+        let(:another_money) { described_class.new(6.11, 'UAH') }
+        it_behaves_like 'operation with undefined rate'
+      end
+    end
+
+    describe 'Difference' do
+      before do
+        described_class.set_conversion_rates('USD', { 'EUR' => 0.5 })
+      end
+
+      subject { money - another_money }
+
+      context 'work with same currency' do
+        let(:another_money) { described_class.new(20.41, 'EUR')}
+
+        it { is_expected.to be_instance_of described_class }
+        its(:amount) { is_expected.to eq 29.59 }
+        its(:currency) { is_expected.to eq 'EUR' }
+      end
+
+      context 'exchange rate exists' do
+        let(:another_money) { described_class.new(22.22, 'USD')}
+
+        it { is_expected.to be_instance_of described_class }
+        its(:amount) { is_expected.to eq 38.89 }
+        its(:currency) { is_expected.to eq 'EUR' }
+      end
+
+      context 'exchange rate does not exist' do
+        let(:another_money) { described_class.new(6.11, 'UAH') }
+        it_behaves_like 'operation with undefined rate'
+      end
+    end
+
+    describe 'Multiply' do
+      subject { money * 2 }
+
+      it { is_expected.to be_instance_of described_class }
+      its(:amount) { is_expected.to eq 100.00 }
+      its(:currency) { is_expected.to eq 'EUR' }
+    end
+
+    describe 'Divide' do
+      subject { money / 2 }
+
+      it { is_expected.to be_instance_of described_class }
+      its(:amount) { is_expected.to eq 25.00 }
+      its(:currency) { is_expected.to eq 'EUR' }
     end
   end
 end

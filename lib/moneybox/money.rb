@@ -36,5 +36,21 @@ module Moneybox
         raise ArgumentError, "Currency rate does not exist: #{currency} to #{new_currency}"
       end
     end
+
+    def + (arg)
+      Money.new((amount_cents + arg.convert_to(currency).amount_cents)/100.0, currency)
+    end
+
+    def - (arg)
+      Money.new((amount_cents - arg.convert_to(currency).amount_cents)/100.0, currency)
+    end
+
+    def * (coefficient)
+      Money.new((amount_cents * coefficient)/100.0, currency)
+    end
+
+    def / (coefficient)
+      Money.new((amount_cents / coefficient)/100.0, currency)
+    end
   end
 end
