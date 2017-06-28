@@ -1,5 +1,5 @@
 require "moneybox/version"
+require "moneybox/money"
 
 module Moneybox
-  # Your code goes here...
 end
