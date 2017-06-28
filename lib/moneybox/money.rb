@@ -26,5 +26,15 @@ module Moneybox
     def amount
       amount_cents / 100.00
     end
+
+    def convert_to(new_currency)
+      return self if new_currency == currency
+      rate = Money.get_conversion_rates_for(currency)[new_currency]
+      if rate
+        Money.new((amount_cents * rate) / 100.00, new_currency )
+      else
+        raise ArgumentError, "Currency rate does not exist: #{currency} to #{new_currency}"
+      end
+    end
   end
 end
