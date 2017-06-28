@@ -1,6 +1,19 @@
 require 'spec_helper'
 
 describe Moneybox::Money do
+  context 'class methods' do
+    describe 'conversion_rates' do
+      before do
+        described_class.set_conversion_rates('EUR', { 'USD' => 1.1, 'BTC' => 0.0047 })
+      end
+
+      subject { described_class.get_conversion_rates_for('EUR') }
+
+      it { is_expected.to be_instance_of Hash }
+      it { is_expected.to eq({ 'USD' => 1.1, 'BTC' => 0.0047 }) }
+    end
+  end
+
   context 'instance methods' do
     let(:money) { described_class.new(50, 'EUR') }
 
