@@ -37,20 +37,32 @@ module Moneybox
       end
     end
 
-    def + (arg)
+    def +(arg)
       Money.new((amount_cents + arg.convert_to(currency).amount_cents)/100.0, currency)
     end
 
-    def - (arg)
+    def -(arg)
       Money.new((amount_cents - arg.convert_to(currency).amount_cents)/100.0, currency)
     end
 
-    def * (coefficient)
+    def *(coefficient)
       Money.new((amount_cents * coefficient)/100.0, currency)
     end
 
-    def / (coefficient)
+    def /(coefficient)
       Money.new((amount_cents / coefficient)/100.0, currency)
+    end
+
+    def ==(arg)
+      amount_cents == arg.convert_to(currency).amount_cents
+    end
+
+    def >(arg)
+      amount_cents > arg.convert_to(currency).amount_cents
+    end
+
+    def <(arg)
+      amount_cents < arg.convert_to(currency).amount_cents
     end
   end
 end

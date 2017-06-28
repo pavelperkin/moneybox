@@ -140,5 +140,126 @@ describe Moneybox::Money do
       its(:amount) { is_expected.to eq 25.00 }
       its(:currency) { is_expected.to eq 'EUR' }
     end
+
+    describe 'Equal' do
+      before do
+        described_class.set_conversion_rates('USD', { 'EUR' => 0.5 })
+      end
+
+      subject { money == another_money }
+
+      context 'work with same currency' do
+        context 'amounts are equal' do
+          let(:another_money) { described_class.new(50, 'EUR')}
+          it { is_expected.to be_truthy }
+        end
+        context 'amounts are different' do
+          let(:another_money) { described_class.new(60, 'EUR')}
+          it { is_expected.to be_falsey }
+        end
+      end
+
+      context 'exchange rate exists' do
+        context 'amounts are equal' do
+          let(:another_money) { described_class.new(100, 'USD')}
+          it { is_expected.to be_truthy }
+        end
+        context 'amounts are different' do
+          let(:another_money) { described_class.new(80, 'USD')}
+          it { is_expected.to be_falsey }
+        end
+      end
+
+      context 'exchange rate does not exist' do
+        let(:another_money) { described_class.new(6.11, 'UAH') }
+        it_behaves_like 'operation with undefined rate'
+      end
+    end
+
+    describe 'Greater' do
+      before do
+        described_class.set_conversion_rates('USD', { 'EUR' => 0.5 })
+      end
+
+      subject { money > another_money }
+
+      context 'work with same currency' do
+        context 'argument equals' do
+          let(:another_money) { described_class.new(50, 'EUR')}
+          it { is_expected.to be_falsey }
+        end
+        context 'argument greater' do
+          let(:another_money) { described_class.new(60, 'EUR')}
+          it { is_expected.to be_falsey }
+        end
+        context 'argument less' do
+          let(:another_money) { described_class.new(40, 'EUR')}
+          it { is_expected.to be_truthy }
+        end
+      end
+
+      context 'exchange rate exists' do
+        context 'argument equals' do
+          let(:another_money) { described_class.new(100, 'USD')}
+          it { is_expected.to be_falsey }
+        end
+        context 'argument greater' do
+          let(:another_money) { described_class.new(120, 'USD')}
+          it { is_expected.to be_falsey }
+        end
+        context 'argument less' do
+          let(:another_money) { described_class.new(80, 'USD')}
+          it { is_expected.to be_truthy }
+        end
+      end
+
+      context 'exchange rate does not exist' do
+        let(:another_money) { described_class.new(6.11, 'UAH') }
+        it_behaves_like 'operation with undefined rate'
+      end
+    end
+
+    describe 'Less' do
+      before do
+        described_class.set_conversion_rates('USD', { 'EUR' => 0.5 })
+      end
+
+      subject { money < another_money }
+
+      context 'work with same currency' do
+        context 'argument equals' do
+          let(:another_money) { described_class.new(50, 'EUR')}
+          it { is_expected.to be_falsey }
+        end
+        context 'argument greater' do
+          let(:another_money) { described_class.new(60, 'EUR')}
+          it { is_expected.to be_truthy }
+        end
+        context 'argument less' do
+          let(:another_money) { described_class.new(40, 'EUR')}
+          it { is_expected.to be_falsey }
+        end
+      end
+
+      context 'exchange rate exists' do
+        context 'argument equals' do
+          let(:another_money) { described_class.new(100, 'USD')}
+          it { is_expected.to be_falsey }
+        end
+        context 'argument greater' do
+          let(:another_money) { described_class.new(120, 'USD')}
+          it { is_expected.to be_truthy }
+        end
+        context 'argument less' do
+          let(:another_money) { described_class.new(80, 'USD')}
+          it { is_expected.to be_falsey }
+        end
+      end
+
+      context 'exchange rate does not exist' do
+        let(:another_money) { described_class.new(6.11, 'UAH') }
+        it_behaves_like 'operation with undefined rate'
+      end
+    end
   end
 end
